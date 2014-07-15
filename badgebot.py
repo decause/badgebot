@@ -1,6 +1,9 @@
-import urllib
-import tempfile
+#!/usr/bin/env python
+
+import os
 import sys
+import tempfile
+import urllib
 
 import tweepy
 import fedmsg
