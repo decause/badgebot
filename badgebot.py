@@ -1,5 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 
+import logging
+import logging.config
 import os
 import sys
 import tempfile
@@ -9,19 +11,27 @@ import tweepy
 import fedmsg
 import fedmsg.meta
 
+
+# First, load the fedmsg config from fedmsg.d/
 config = fedmsg.config.load_config()
+
+# Then, configure the python stdlib logging to use fedmsg's logging config
+logging.config.dictConfig(config.get('logging'))
+
+# Initialize fedmsg's "meta" module if you have the fedora infra plugin
 fedmsg.meta.make_processors(**config)
 
+# Grab our twitter credentials from the config.  Raise an error if absent.
+print "Setting up twitter connection."
 consumer_key        = config['consumer_key']
 consumer_secret     = config['consumer_secret']
 access_token_key    = config['access_token_key']
 access_token_secret = config['access_token_secret']
-
 auth_handler = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth_handler.set_access_token(access_token_key, access_token_secret)
 twitter_api = tweepy.API(auth_handler)
 
-
+# Grab some other config bits.
 badgebot_topic_filter = config.get('badgebot_topic_filter')
 badgebot_username = config.get('badgebot_fas_username')
 
@@ -36,6 +46,7 @@ if badgebot_username:
 else:
     print "  Relating to any user at all!"
 
+print "Posting up to listen on the fedmsg bus.  Waiting for a message..."
 for name, endpoint, topic, msg in fedmsg.tail_messages():
     if badgebot_topic_filter not in topic:
         continue
