@@ -1,0 +1,13 @@
+[Unit]
+Description=A Twitter bot for your Fedora Badges.  Wow.
+After=network.target
+Documentation=http://fedmsg.com
+
+[Service]
+ExecStart=/usr/local/bin/badgebot.py
+Type=simple
+User=fedmsg
+Group=fedmsg
+
+[Install]
+WantedBy=multi-user.target
